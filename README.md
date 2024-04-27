@@ -1,2 +1,2 @@
-# C-in-Embedded-Systems
+# Cpp-in-Embedded-Systems
 C++ in Embedded Systems, published by Packt 
