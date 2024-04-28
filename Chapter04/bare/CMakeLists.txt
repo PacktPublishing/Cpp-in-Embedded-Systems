@@ -119,12 +119,12 @@ target_link_options(
   -T${CMAKE_SOURCE_DIR}/platform/STM32F072C8Tx_FLASH.ld
   -mcpu=cortex-m0
   -mthumb
-  -specs=nosys.specs
   -specs=nano.specs
+  -lnosys
   -u
   -lc
   -lm
-  -lnosys
+  -Wl,--no-warn-rwx-segments
   -Wl,-Map=${PROJECT_NAME}.map,--cref
   -Wl,--gc-sections)
 
