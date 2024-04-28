@@ -21,15 +21,10 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
 set(CDEFS "-DUSE_HAL_DRIVER -DSTM32F072xB")
 set(MCU "-mcpu=cortex-m0 -mthumb")
-set(CMAKE_C_FLAGS
-    "${MCU} ${CDEFS}  -fdata-sections -ffunction-sections  -Wno-address-of-packed-member -Wall -Wextra -Wno-unused-parameter"
-    CACHE INTERNAL "")
-set(CMAKE_CXX_FLAGS
-    "${CMAKE_C_FLAGS} -Wno-register -fno-exceptions -fno-rtti -fno-threadsafe-statics"
-    CACHE INTERNAL "")
-
-set(ASM_OPTIONS "-x assembler-with-cpp")
-set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS} ${ASM_OPTIONS}")
+set(COMMON_FLAGS "${MCU} ${CDEFS}  -fdata-sections -ffunction-sections  -Wno-address-of-packed-member -Wall -Wextra -Wno-unused-parameter")
+set(CMAKE_C_FLAGS "${COMMON_FLAGS}")
+set(CMAKE_CXX_FLAGS "${COMMON_FLAGS} -Wno-register -fno-exceptions -fno-rtti -fno-threadsafe-statics")
+set(CMAKE_ASM_FLAGS "${COMMON_FLAGS} -x assembler-with-cpp")
 
 set(CMAKE_C_FLAGS_DEBUG "-g -gdwarf-2 -O0")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -gdwarf-2 -O0")
