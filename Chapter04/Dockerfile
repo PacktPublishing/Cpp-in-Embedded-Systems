@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     software-properties-common \
     cmake \ 
     make \
+    git \
     && add-apt-repository ppa:deadsnakes/ppa \
     && apt-get update \
     && apt-get install -y python3.8 python3.8-distutils \

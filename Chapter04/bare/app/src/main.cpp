@@ -1,9 +1,8 @@
 #include <cstdint>
 
-#include <stm32f0xx_hal.h>
-
 #include <hal.hpp>
 #include <uart_stm32.hpp>
+#include <stm32f072xb.h>
 
 extern "C" int main(void)
 {
@@ -15,14 +14,14 @@ extern "C" int main(void)
     uart.puts("Hello world !\r\n");
 
     std::uint32_t time_prev = hal::time::get_ms();
-    while(1)
+    constexpr std::uint32_t c_1000_ms = 1000;
+    while(true)
     {
-        if(volatile auto time_now = hal::time::get_ms();
-           time_now - time_prev > 1000)
+        if(auto time_now = hal::time::get_ms();
+           time_now - time_prev > c_1000_ms)
         {
             uart.puts("While loop 1000 ms ping ...\r\n");
             time_prev = time_now;
         }
     }
 }
-

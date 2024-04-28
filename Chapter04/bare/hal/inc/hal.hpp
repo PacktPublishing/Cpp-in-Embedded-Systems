@@ -13,7 +13,7 @@ inline void init()
 
 struct time
 {
-    inline static std::uint32_t get_ms()
+    static std::uint32_t get_ms()
     {
         return HAL_GetTick();
     }
