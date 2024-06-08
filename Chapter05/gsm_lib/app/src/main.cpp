@@ -1,11 +1,5 @@
 #include <cstdint>
 
-
-#include <span>
-
-#include <cstdio>
-#include <cstdint>
-
 #include <stm32f072xb.h>
 
 #include <hal.hpp>
