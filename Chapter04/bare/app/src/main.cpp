@@ -4,7 +4,7 @@
 #include <uart_stm32.hpp>
 #include <stm32f072xb.h>
 
-extern "C" int main(void)
+int main()
 {
     hal::init();
 

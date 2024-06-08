@@ -25,7 +25,7 @@ class gsm_lib{
 };
 
 
-extern "C" int main(void)
+int main()
 {
     hal::init();
 
