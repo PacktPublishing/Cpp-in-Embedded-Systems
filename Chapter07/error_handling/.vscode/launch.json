@@ -1,0 +1,32 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug application in Renode",
+            "type": "cortex-debug",
+            "request": "launch",
+            "preLaunchTask": "Run Renode Debug",
+            "postDebugTask": "Close Renode",
+            "servertype": "external",
+            "gdbPath": "arm-none-eabi-gdb",
+            "gdbTarget": "localhost:3333",
+            "cwd": "${workspaceRoot}",
+            "executable": "${workspaceFolder}/build/bare.elf",
+            "preLaunchCommands": [
+                "monitor machine Reset",
+                "monitor start",
+                "monitor continue"
+            ],
+        }, 
+        {
+            "name": "Run Without Debugging",
+            "type": "node", 
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Run Renode",  
+            "postDebugTask": "Close Renode",
+            "internalConsoleOptions": "neverOpen",
+        }
+    ]
+}
+
