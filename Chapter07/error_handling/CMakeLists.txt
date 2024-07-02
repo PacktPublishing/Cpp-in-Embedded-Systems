@@ -83,6 +83,8 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/cstdlib_support
   )
 
+set(MAIN_CPP_PATH "${CMAKE_SOURCE_DIR}/app/src/")
+set(MAIN_CPP_FILE_NAME "main_assert.cpp" CACHE STRING "main")
 
 set(EXECUTABLE ${PROJECT_NAME}.elf)
 
@@ -98,9 +100,9 @@ add_executable(
   platform/src/stm32f0xx_hal_msp.c
   platform/src/stm32f0xx_it.c
   platform/src/system_stm32f0xx.c
-  app/src/main.cpp
   hal/uart/src/uart_stm32.cpp
   cstdlib_support/retarget.cpp
+  ${MAIN_CPP_PATH}/${MAIN_CPP_FILE_NAME}
   )
 
 target_link_libraries(${EXECUTABLE} PUBLIC)
