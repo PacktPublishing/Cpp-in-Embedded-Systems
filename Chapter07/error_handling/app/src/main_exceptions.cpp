@@ -1,5 +1,7 @@
 #include <cstdint>
 #include <cstdio>
+#include <cstdlib>
+#include <exception>
 
 #include <stm32f072xb.h>
 
@@ -8,28 +10,16 @@
 
 #include <retarget.hpp>
 
-void log_pc_and_halt(std::uint32_t pc) {
-    printf("Assert at 0x%08lX\r\n", pc);
-    while(true) {}
-}
+template <class T, std::size_t N> struct ring_buffer {
 
-#define light_assert(expr)         \
-        (static_cast<bool> (expr)  \
-        ? void (0)                 \
-        : log_pc_and_halt(hal::get_pc())    \
-        )
+  std::array<T, N> arr;
+  std::size_t write_idx = 0; // Index of the next element to write (push)
 
-enum class option : std::uint8_t {
-    Option1 = 0, 
-    Option2, 
-    Option3,
-    Last
+  void push(T t) {
+    arr.at(write_idx++) = t;
+  }
 };
-    
-option uint8_to_option(uint8_t num) {
-    light_assert(num < static_cast<uint8_t>(option::Last));
-    return static_cast<option>(num);
-}
+
 
 int main()
 {
@@ -39,7 +29,18 @@ int main()
     uart.init();
 
     retarget::set_stdio_uart(&uart);
-    
+
+    printf("Exceptions example\r\n");
+
+    std::set_terminate([]() {
+        printf("Unhandled exception!\r\n");
+        while(true){}
+    });
+
+    std::array<int, 4> arr;
+
+    arr.at(5) = 6;
+
     printf("Exceptions example\r\n");
 
     while(true)
