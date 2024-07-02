@@ -68,7 +68,7 @@ project(bare VERSION 1.0.6)
 
 enable_language(C CXX ASM)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # global include directories
