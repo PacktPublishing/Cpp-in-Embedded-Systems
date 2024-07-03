@@ -13,9 +13,8 @@
 #include <retarget.hpp>
 
 template <class T, std::size_t N> struct ring_buffer {
-
   std::array<T, N> arr;
-  std::size_t write_idx = 0; // Index of the next element to write (push)
+  std::size_t write_idx = 0; 
 
   void push(T t) {
     arr.at(write_idx++) = t;
@@ -35,30 +34,34 @@ int main()
     printf("Exceptions example\r\n");
 
     std::set_terminate([]() {
-        printf("Unhandled exception!\r\n");
+        printf("My terminate handler!\r\n");
         while(true){}
     });
 
     std::array<int, 4> arr;
 
-    //arr.at(5) = 6;
+    // uncomment the following line to trigger terminate handler
+    // arr.at(5) = 6;
 
-    //throw 1;
     try {
-      //throw 1;
       arr.at(5) = 6;
-      
     }
-    catch (int i) {
-      printf("i = %d\r\n", i);
-    }
-    catch(std::out_of_range) {
-      printf("out of range\r\n");
+    catch(std::out_of_range &e) {
+      printf("Array out of range!\r\n");
     }
     catch (...) {
-      printf("Catch\r\n");
+      printf("Unexpected expection...\r\n");
     }
-    
+
+    ring_buffer<int, 4> rb;
+    try {
+      for(int i = 0; i < 6; i++) {
+        rb.push(i);
+      }
+    }
+    catch(std::out_of_range &e) {
+      printf("Ring buffer out of range!\r\n");
+    } 
 
     while(true)
     {
