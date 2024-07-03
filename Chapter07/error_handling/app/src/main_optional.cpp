@@ -38,7 +38,7 @@ int main()
 
     printf("std::optional example\r\n");
 
-    auto get_data_from_main = [] () {
+    const auto get_data_from_main = [] () {
       auto result = sensor::get_data();
       if(result) {
           printf("x = %d, y = %d\r\n", (*result).x, (*result).y);
