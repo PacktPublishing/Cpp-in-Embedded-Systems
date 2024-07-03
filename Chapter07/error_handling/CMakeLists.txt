@@ -9,7 +9,23 @@ set(CMAKE_OBJCOPY "arm-none-eabi-objcopy")
 set(CMAKE_SIZE "arm-none-eabi-size")
 
 set(RENODE "renode" CACHE STRING "Path to Renode executable")
-message(STATUS "Using Renode at: ${RENODE}")
+
+set(MAIN_CPP_PATH "${CMAKE_SOURCE_DIR}/app/src/")
+set(MAIN_CPP_FILE_NAME "main_assert.cpp" CACHE STRING "main file")
+list(APPEND LIB_SPECS "-specs=nosys.specs")
+
+set(EXCEPTIONS_FLAGS "-fno-exceptions -fno-rtti")
+
+if("${MAIN_CPP_FILE_NAME}" STREQUAL "main_exceptions.cpp")
+    message(STATUS "Enabling exceptions")
+    set(EXCEPTIONS_FLAGS "-fexceptions")
+    set(LIB_SPECS "-specs=nosys.specs")
+else()
+    message(STATUS "Exceptions are disabled")
+    list(APPEND LIB_SPECS "-specs=nano.specs")
+endif()
+message(STATUS "Exceptions flags set to: ${EXCEPTIONS_FLAGS}")
+message(STATUS "Lib specs set to: ${LIB_SPECS}")
 
 
 find_program(CCACHE_FOUND ccache)
@@ -23,11 +39,11 @@ set(CDEFS "-DUSE_HAL_DRIVER -DSTM32F072xB")
 set(MCU "-mcpu=cortex-m0 -mthumb")
 set(COMMON_FLAGS "${MCU} ${CDEFS}  -fdata-sections -ffunction-sections  -Wno-address-of-packed-member -Wall -Wextra -Wno-unused-parameter")
 set(CMAKE_C_FLAGS "${COMMON_FLAGS}")
-set(CMAKE_CXX_FLAGS "${COMMON_FLAGS} -Wno-register -fno-exceptions -fno-rtti -fno-threadsafe-statics")
+set(CMAKE_CXX_FLAGS "${COMMON_FLAGS} -Wno-register ${EXCEPTIONS_FLAGS} -fno-threadsafe-statics")
 set(CMAKE_ASM_FLAGS "${COMMON_FLAGS} -x assembler-with-cpp")
 
-set(CMAKE_C_FLAGS_DEBUG "-g -gdwarf-2 -O1")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -gdwarf-2 -O1")
+set(CMAKE_C_FLAGS_DEBUG "-g -gdwarf-2 -O0")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -gdwarf-2 -O0")
 set(CMAKE_C_FLAGS_RELEASE "-O2 -flto")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -flto")
 set(CMAKE_C_FLAGS_MINSIZEREL "-Os -flto")
@@ -83,9 +99,6 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/cstdlib_support
   )
 
-set(MAIN_CPP_PATH "${CMAKE_SOURCE_DIR}/app/src/")
-set(MAIN_CPP_FILE_NAME "main_assert.cpp" CACHE STRING "main")
-
 set(EXECUTABLE ${PROJECT_NAME}.elf)
 
 add_executable(
@@ -118,8 +131,7 @@ target_link_options(
   -T${CMAKE_SOURCE_DIR}/platform/STM32F072C8Tx_FLASH.ld
   -mcpu=cortex-m0
   -mthumb
-  -specs=nano.specs
-  -specs=nosys.specs
+  ${LIB_SPECS}
   -lnosys
   -u
   -lc

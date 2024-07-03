@@ -1,7 +1,9 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
+#include <csignal>
 #include <exception>
+#include <stdexcept>
 
 #include <stm32f072xb.h>
 
@@ -39,11 +41,27 @@ int main()
 
     std::array<int, 4> arr;
 
-    arr.at(5) = 6;
+    //arr.at(5) = 6;
 
-    printf("Exceptions example\r\n");
+    //throw 1;
+    try {
+      //throw 1;
+      arr.at(5) = 6;
+      
+    }
+    catch (int i) {
+      printf("i = %d\r\n", i);
+    }
+    catch(std::out_of_range) {
+      printf("out of range\r\n");
+    }
+    catch (...) {
+      printf("Catch\r\n");
+    }
+    
 
     while(true)
     {
     }
 }
+ 
