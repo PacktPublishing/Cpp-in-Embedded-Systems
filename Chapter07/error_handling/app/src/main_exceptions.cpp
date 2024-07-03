@@ -21,7 +21,6 @@ template <class T, std::size_t N> struct ring_buffer {
   }
 };
 
-
 int main()
 {
     hal::init();
