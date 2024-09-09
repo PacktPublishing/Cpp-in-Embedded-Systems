@@ -1,0 +1,23 @@
+using sysbus
+
+mach create
+machine LoadPlatformDescription @platforms/cpus/stm32f072.repl
+machine LoadPlatformDescriptionFromString "button1: Miscellaneous.Button @ gpioPortA 4 { IRQ -> gpioPortA@4 }"
+machine LoadPlatformDescriptionFromString "button2: Miscellaneous.Button @ gpioPortA 5 { IRQ -> gpioPortA@5 }"
+machine LoadPlatformDescriptionFromString "button3: Miscellaneous.Button @ gpioPortA 6 { IRQ -> gpioPortA@6 }"
+machine LoadPlatformDescriptionFromString "button4: Miscellaneous.Button @ gpioPortA 7 { IRQ -> gpioPortA@7 }"
+machine LoadPlatformDescriptionFromString "button5: Miscellaneous.Button @ gpioPortA 8 { IRQ -> gpioPortA@8 }"
+machine LoadPlatformDescriptionFromString "button6: Miscellaneous.Button @ gpioPortA 9 { IRQ -> gpioPortA@9 }"
+
+$bin?=$ORIGIN/../build/bare.elf
+
+showAnalyzer usart2
+
+macro reset
+"""
+    sysbus LoadELF $bin
+"""
+
+runMacro $reset
+
+machine StartGdbServer 3333

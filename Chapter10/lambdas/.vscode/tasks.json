@@ -1,0 +1,126 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Configure",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-S",
+                "${workspaceFolder}",  // Specifies the source directory
+                "-B",
+                "${workspaceFolder}/build",  // Specifies the build directory
+                "-DCMAKE_BUILD_TYPE=Debug"  // Example of setting a CMake variable
+            ],
+            "group": "build",
+            "problemMatcher": [],
+            "detail": "Generates build system files with CMake"
+        },
+        {
+            "label": "Copy Compile Db",
+            "type": "shell",
+            "dependsOn": [
+                "Configure"
+            ],
+            "command": "cp ${workspaceFolder}/build/compile_commands.json ${workspaceFolder}",
+            "group": "build",
+            "problemMatcher": [],
+            "detail": "Generates build system files with CMake"
+        },
+        {
+            "label": "Build",
+            "type": "shell",
+            "dependsOn": [
+                "Copy Compile Db"
+            ],
+            "command": "make",
+            "args": [
+                "-C", "build"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Run Renode",
+            "type": "shell",
+            "command": "renode",
+            "args": [
+                "--console",
+                "--disable-xwt",
+                "${workspaceFolder}/renode_scripts/stm32f072.resc"
+            ],
+            "dependsOn": [
+                "Build"
+            ],
+            "isBackground": true,
+            "problemMatcher": {
+                "source": "Renode",
+                "pattern": {
+                    "regexp": ""
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "Renode, version .*",
+                    "endsPattern": ".*GDB server with all CPUs started on port.*"
+                }
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            }
+        },
+        {
+            "label": "Run Renode Debug",
+            "type": "shell",
+            "command": "renode",
+            "args": [
+                "--console",
+                "--disable-xwt",
+                "${workspaceFolder}/renode_scripts/stm32f072_debug.resc"
+            ],
+            "dependsOn": [
+                "Build"
+            ],
+            "isBackground": true,
+            "problemMatcher": {
+                "source": "Renode",
+                "pattern": {
+                    "regexp": ""
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "Renode, version .*",
+                    "endsPattern": ".*GDB server with all CPUs started on port.*"
+                }
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            }
+        },
+        {
+            "label": "Close Renode",
+            "command": "echo ${input:terminate}",
+            "type": "shell",
+            "problemMatcher": []
+        }
+    ],
+    "inputs": [
+        {
+            "id": "terminate",
+            "type": "command",
+            "command": "workbench.action.tasks.terminate",
+            "args": "terminateAll"
+        }
+    ]
+}
+
