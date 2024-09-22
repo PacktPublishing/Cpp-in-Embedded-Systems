@@ -8,8 +8,9 @@ struct signal : public std::array<T, N>
 
   constexpr signal() {}
 
-  constexpr signal(float begin, float end)
+  constexpr signal(T begin, T end)
   {
+    static_assert(N > 1, "N must be bigger than 1");	  
     float step = (end - begin) / (N - 1);
 
     for (std::size_t i = 0; i < N; i++)
