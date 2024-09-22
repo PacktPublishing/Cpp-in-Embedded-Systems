@@ -9,6 +9,7 @@ Checks: >
   -performance-no-int-to-ptr,
   portability-*,
   readability-*,
+  -readability-identifier-length
   readability-identifier-naming
 
 CheckOptions:

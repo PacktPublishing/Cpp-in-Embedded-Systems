@@ -4,69 +4,31 @@
 #include <stm32f072xb.h>
 
 #include <hal.hpp>
+#include <units.hpp>
 #include <uart_stm32.hpp>
+#include <adc_stm32.hpp>
 
 #include <retarget.hpp>
+#include <signal.hpp>
 
 #include <algorithm>
 #include <array>
 
-#include <gpio_stm32.hpp>
+namespace {
+    struct voltage_divider {
+        units::resistance r2; 
+        units::voltage vcc;
 
-ADC_HandleTypeDef hadc;
-
-static void MX_ADC_Init(void)
-{
-
-  /* USER CODE BEGIN ADC_Init 0 */
-
-  /* USER CODE END ADC_Init 0 */
-
-  ADC_ChannelConfTypeDef sConfig = {0};
-
-  /* USER CODE BEGIN ADC_Init 1 */
-
-  /* USER CODE END ADC_Init 1 */
-
-  /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
-  */
-  hadc.Instance = ADC1;
-  hadc.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV1;
-  hadc.Init.Resolution = ADC_RESOLUTION_12B;
-  hadc.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-  hadc.Init.ScanConvMode = ADC_SCAN_DIRECTION_FORWARD;
-  hadc.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
-  hadc.Init.LowPowerAutoWait = DISABLE;
-  hadc.Init.LowPowerAutoPowerOff = DISABLE;
-  hadc.Init.ContinuousConvMode = DISABLE;
-  hadc.Init.DiscontinuousConvMode = DISABLE;
-  hadc.Init.ExternalTrigConv = ADC_SOFTWARE_START;
-  hadc.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
-  hadc.Init.DMAContinuousRequests = DISABLE;
-  hadc.Init.Overrun = ADC_OVR_DATA_PRESERVED;
-  if (HAL_ADC_Init(&hadc) != HAL_OK)
-  {
-    //Error_Handler();
-  }
-
-  /** Configure for the selected ADC regular channel to be converted.
-  */
-  sConfig.Channel = ADC_CHANNEL_0;
-  sConfig.Rank = ADC_RANK_CHANNEL_NUMBER;
-  sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
-  if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK)
-  {
-    //Error_Handler();
-  }
-  /* USER CODE BEGIN ADC_Init 2 */
-
-  /* USER CODE END ADC_Init 2 */
-
-}
-
+        units::resistance get_r1(units::voltage vadc) {
+            return r2 * (vcc/vadc - 1);
+        }
+    };
+};
 
 int main()
 {
+    using namespace units;
+
     hal::init();
 
     hal::uart_stm32 uart(USART2);
@@ -74,28 +36,58 @@ int main()
 
     retarget::set_stdio_uart(&uart);
 
-    MX_ADC_Init();
+    hal::adc_stm32 adc(3.3_V);
+    adc.init();
+
+    constexpr float A = 1.18090254918130e-3;
+    constexpr float B = 2.16884014794388e-4;
+    constexpr float C = 1.90058756197216e-6;
+    constexpr float D = 1.83161892641824e-8;
+
+    constexpr int c_lut_points = 50;
+
+    constexpr signal<float, c_lut_points> resistance(1e3, 10e3);
+
+    constexpr auto temperature_k = 1 / (A +
+                                        B * signal(resistance, [](float x)
+                                                 { return std::log(x); }) +
+                                        C * signal(resistance, [](float x)
+                                                 { return std::pow(std::log(x), 2); }) +
+                                        D * signal(resistance, [](float x)
+                                                 { return std::pow(std::log(x), 3); }));
+
+    constexpr auto temperature_celsius = temperature_k - 273.15;
+
+    voltage_divider divider{10e3_Ohm, 3.3_V};
     
-
-    const hal::gpio_stm32<hal::port_a> button1(hal::pin::p4, [](){
-        printf("Button1 pressed!\r\n");
-    });
-
-    const hal::gpio_stm32<hal::port_a> button2(hal::pin::p5, [](){
-        printf("Button2 pressed!\r\n");
-    });
-    
-
     while(true)
     {
-        HAL_ADC_Start(&hadc);
-        HAL_ADC_PollForConversion(&hadc, 1000);
+        auto adc_val = adc.get_reading();
+        if(adc_val) {
+            auto adc_val_voltage = *adc_val;
+            auto thermistor_r = divider.get_r1(adc_val_voltage);
 
-        auto adc_val = HAL_ADC_GetValue(&hadc);
-        float mv = 3.3f * static_cast<float>(adc_val) / 4096.f;
-        printf("%d, %.2f\r\n", adc_val, mv);
-        hal::time::delay_ms(1000);
+            auto it = std::lower_bound(resistance.begin(), resistance.end(), thermistor_r.get());
+            
+            if(it != resistance.end()) {
+
+              std::size_t pos = std::distance(resistance.begin(), it);
+              float temperature = temperature_celsius.at(pos);
+
+              printf("%d mV, %d Ohm, %d.%d C\r\n", static_cast<int>(adc_val_voltage.get_mili()),
+                                        static_cast<int>(thermistor_r.get()),
+                                        static_cast<int>(temperature),
+                                        static_cast<int>(10*(temperature-std::floor(temperature)))
+                                        ); 
+            }
+        }
+        hal::time::delay_ms(200);
     }
 }
 
-// adc FeedVoltageSampleToChannel 0 3100 10
+// adc FeedVoltageSampleToChannel 0 3000 3 -> 1001 Ohm
+// adc FeedVoltageSampleToChannel 0 2800 3 -> 1787 Ohm
+// adc FeedVoltageSampleToChannel 0 2400 3 -> 3754 Ohm
+// adc FeedVoltageSampleToChannel 0 2200 3 -> 5003 Ohm
+// adc FeedVoltageSampleToChannel 0 2000 3 -> 6502 Ohm
+// adc FeedVoltageSampleToChannel 0 1700 3 -> 9412 Ohm

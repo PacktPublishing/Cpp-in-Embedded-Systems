@@ -86,7 +86,9 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/hal/uart/inc
   ${CMAKE_SOURCE_DIR}/hal/inc
   ${CMAKE_SOURCE_DIR}/hal/gpio/inc
+  ${CMAKE_SOURCE_DIR}/hal/adc/inc
   ${CMAKE_SOURCE_DIR}/cstdlib_support
+  ${CMAKE_SOURCE_DIR}/util/inc
   )
 
 set(EXECUTABLE ${PROJECT_NAME}.elf)
@@ -108,7 +110,9 @@ add_executable(
   hal/uart/src/uart_stm32.cpp
   hal/gpio/src/gpio.cpp
   hal/gpio/src/gpio_interrupt_manager.cpp
+  hal/adc/src/adc_stm32.cpp
   cstdlib_support/retarget.cpp
+  util/src/units.cpp
   ${MAIN_CPP_PATH}/${MAIN_CPP_FILE_NAME}
   )
 

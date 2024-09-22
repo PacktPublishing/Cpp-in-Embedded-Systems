@@ -3,8 +3,6 @@
 #include <cstdint>
 #include <functional>
 
-//#include <gpio_interrupt_handler.hpp>
-
 namespace hal
 {
 class gpio
