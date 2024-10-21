@@ -66,7 +66,7 @@ struct timer {
     using cr1 = reg<base_address + 0x00>;
     using dier = reg<base_address + 0x0C>;
     using sr = reg<base_address + 0x10>;
-    using psc = reg<base_address + 0x28, read_write_access, std::uint32_t>;
+    using psc = reg<base_address + 0x28>;
     using arr = reg<base_address + 0x2C>;
 
     template<auto Bits, typename Reg, uint32_t Mask, uint32_t Pos = 0>
@@ -130,20 +130,18 @@ struct timer {
 using timer2 = timer<timer2_traits>;
 using timer3 = timer<timer3_traits>;
 
-// Timer interrupt handler
 extern "C" void TIM2_IRQHandler(void)
 {
-    if (timer2::sr::read() & TIM_SR_UIF)  // Check if update interrupt flag is set
+    if (timer2::sr::read() & TIM_SR_UIF) 
     {
         timer2::sr::set<timer2::uif>(timer2::uif::value::disable);
         printf("TIM2 IRQ..\r\n");
     }
 }
 
-// Timer interrupt handler
 extern "C" void TIM3_IRQHandler(void)
 {
-    if (timer3::sr::read() & TIM_SR_UIF)  // Check if update interrupt flag is set
+    if (timer3::sr::read() & TIM_SR_UIF) 
     {
         timer3::sr::set<timer3::uif>(timer3::uif::value::disable);
         printf("TIM3 IRQ..\r\n");
