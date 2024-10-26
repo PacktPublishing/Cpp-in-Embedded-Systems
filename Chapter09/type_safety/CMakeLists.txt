@@ -11,7 +11,7 @@ set(CMAKE_SIZE "arm-none-eabi-size")
 set(RENODE "renode" CACHE STRING "Path to Renode executable")
 
 set(MAIN_CPP_PATH "${CMAKE_SOURCE_DIR}/app/src/")
-set(MAIN_CPP_FILE_NAME "main_integer_promotion.cpp" CACHE STRING "main file")
+set(MAIN_CPP_FILE_NAME "main_usual_arithmetic_conversion.cpp" CACHE STRING "main file")
 list(APPEND LIB_SPECS "-specs=nosys.specs")
 list(APPEND LIB_SPECS "-specs=nano.specs")
 

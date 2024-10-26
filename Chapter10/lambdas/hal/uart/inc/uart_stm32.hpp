@@ -18,7 +18,7 @@ class uart_stm32 : public uart
 
     void init(std::uint32_t baudrate = c_baudrate_default) override;
 
-    void write_array(const char * ptr, std::size_t len) override;
+    void write(std::span<const char> data) override;
 
   private:
     UART_HandleTypeDef huart_;

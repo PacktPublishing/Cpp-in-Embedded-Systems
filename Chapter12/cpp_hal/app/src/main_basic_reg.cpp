@@ -51,8 +51,6 @@ int main()
 
     // RCC->CR = 0xDEADBEEF;
     rcc::write(0xDEADBEEF);
-    auto val = rcc::read();
-    printf("val = %ld\r\n", val);
 
     print_reg(&(RCC->CR));
     

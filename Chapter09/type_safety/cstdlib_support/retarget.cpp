@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
+#include <span>
+
 namespace 
 {
 hal::uart *uart_stdio;
@@ -26,7 +28,7 @@ extern "C" int _write(int fd, char * ptr, int len)
 {
     if(fd == STDOUT_FILENO || fd == STDERR_FILENO)
     {
-        uart_stdio->write_array(ptr, len);
+        uart_stdio->write(std::span<const char>(ptr, len));
     }
 
     return len;

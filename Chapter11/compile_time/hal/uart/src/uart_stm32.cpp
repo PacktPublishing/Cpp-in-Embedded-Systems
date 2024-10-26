@@ -22,10 +22,10 @@ void hal::uart_stm32::init(std::uint32_t baudrate)
     HAL_UART_Init(&huart_);
 }
 
-void hal::uart_stm32::write_array(const char * ptr, std::size_t len)
+void hal::uart_stm32::write(std::span<const char> data) 
 {
     // we must cast away costness due to ST HAL's API
-    char * data_ptr = const_cast<char *>(ptr);
-    HAL_UART_Transmit(&huart_, reinterpret_cast<uint8_t *>(data_ptr), len,
+    char * data_ptr = const_cast<char *>(data.data());
+    HAL_UART_Transmit(&huart_, reinterpret_cast<uint8_t *>(data_ptr), data.size(),
                       HAL_MAX_DELAY);
 }
