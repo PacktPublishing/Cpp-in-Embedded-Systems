@@ -16,6 +16,8 @@ namespace fs{
 
 struct lfs {
 
+    lfs() = delete;
+
     static inline lfs_t fs_lfs;
 
     static void init() {
@@ -33,8 +35,10 @@ public:
         }
     }
     ~file() {
-        printf("Closing file in destructor.\r\n");
-        lfs_file_close(&lfs::fs_lfs, &file_);
+        if(is_open()) {
+            printf("Closing file in destructor.\r\n");
+            lfs_file_close(&lfs::fs_lfs, &file_);
+        }
     }
 
     [[nodiscard]] bool is_open() const {
