@@ -40,6 +40,7 @@ public:
         }
         return get_state_enum();
     }
+
     ble_state get_state_enum() {
        return ble_state::idle; 
     }
@@ -61,6 +62,7 @@ public:
         }
         return get_state_enum();
     }
+
     ble_state get_state_enum() {
        return ble_state::advertising; 
     }
@@ -79,6 +81,7 @@ public:
         }
         return get_state_enum();
     }
+    
     ble_state get_state_enum() {
        return ble_state::connected; 
     }
@@ -105,7 +108,7 @@ public:
     }
 
 private:
-    std::vector<state*> states_;
+    etl::vector<state*, 3> states_;
     ble_state current_state_ = ble_state::idle;
 
     state* get_the_state(ble_state state_enum) {
