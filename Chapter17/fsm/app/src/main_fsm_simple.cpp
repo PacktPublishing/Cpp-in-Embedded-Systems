@@ -74,13 +74,15 @@ private:
     }
 };
 
-static const char* state_to_string(ble_state state) {
+namespace {
+const char* state_to_string(ble_state state) {
     switch (state) {
         case ble_state::idle:        return "idle";
         case ble_state::advertising: return "advertising";
         case ble_state::connected:   return "connected";
         default:                     return "unknown";
     }
+}
 }
 
 int main()

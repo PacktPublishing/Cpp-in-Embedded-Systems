@@ -89,6 +89,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/hal/adc/inc
   ${CMAKE_SOURCE_DIR}/cstdlib_support
   ${CMAKE_SOURCE_DIR}/util/inc
+  ${CMAKE_SOURCE_DIR}/libs/boost
   )
 
 set(EXECUTABLE ${PROJECT_NAME}.elf)
@@ -130,8 +131,6 @@ target_link_options(
   -mthumb
   ${LIB_SPECS}
   -lnosys
-  -u
-  _printf_float
   -lc
   -lm
   -Wl,--no-warn-rwx-segments
