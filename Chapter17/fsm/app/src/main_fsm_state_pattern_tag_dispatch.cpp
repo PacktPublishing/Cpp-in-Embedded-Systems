@@ -19,26 +19,29 @@ enum class ble_state {
     connected
 };
 
-enum class ble_event {
-    ble_button_pressed,
-    connection_request,
-    timer_expired
-};
+struct ble_button_pressed{};
+struct connection_request{};
+struct timer_expired{};
 
 class state {
 public:
-    virtual ble_state handle_event(ble_event event) = 0;
+    virtual ble_state handle_event(ble_button_pressed) {
+        return get_state_enum();
+    }
+    virtual ble_state handle_event(connection_request) {
+        return get_state_enum();
+    }
+    virtual ble_state handle_event(timer_expired) {
+        return get_state_enum();
+    }
     virtual ble_state get_state_enum() = 0;
 };
 
 class idle : public state{
 public:
-    ble_state handle_event(ble_event event) {
-        if (event == ble_event::ble_button_pressed) {
-            start_advertising();
-            return ble_state::advertising;
-        }
-        return get_state_enum();
+    ble_state handle_event(ble_button_pressed bbp) override {
+        start_advertising();
+        return ble_state::advertising;
     }
 
     ble_state get_state_enum() {
@@ -52,15 +55,13 @@ private:
 
 class advertising : public state{
 public:
-    ble_state handle_event(ble_event event) {
-        if (event == ble_event::connection_request) {
-            return ble_state::connected;
-        }
-        if (event == ble_event::timer_expired) {
-            stop_advertising();
-            return ble_state::idle;
-        }
-        return get_state_enum();
+    ble_state handle_event(connection_request cr) override {
+        return ble_state::connected;
+    }
+
+    ble_state handle_event(timer_expired te) override {
+        stop_advertising();
+        return ble_state::idle;
     }
 
     ble_state get_state_enum() {
@@ -74,12 +75,9 @@ private:
 
 class connected : public state{
 public:
-    ble_state handle_event(ble_event event) {
-        if (event == ble_event::ble_button_pressed) {
-            disconnect();
-            return ble_state::idle;
-        }
-        return get_state_enum();
+    ble_state handle_event(ble_button_pressed) {
+        disconnect();
+        return ble_state::idle;
     }
 
     ble_state get_state_enum() {
@@ -93,7 +91,8 @@ private:
 
 class ble_fsm {
 public:
-    void handle_event(ble_event event) {
+    template<typename E>
+    void handle_event(E event) {
         if(auto the_state = get_the_state(current_state_)) {
             current_state_ = the_state->handle_event(event);
         }
@@ -160,13 +159,13 @@ int main()
 
     print_current_state();
 
-    my_ble_fsm.handle_event(ble_event::ble_button_pressed);
+    my_ble_fsm.handle_event(ble_button_pressed{});
     print_current_state();
 
-    my_ble_fsm.handle_event(ble_event::connection_request);
+    my_ble_fsm.handle_event(connection_request{});
     print_current_state();
 
-    my_ble_fsm.handle_event(ble_event::ble_button_pressed);
+    my_ble_fsm.handle_event(ble_button_pressed{});
     print_current_state();
 
 
