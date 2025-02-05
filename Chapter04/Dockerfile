@@ -34,8 +34,23 @@ RUN wget https://github.com/renode/renode/releases/download/v1.15.0/renode-1.15.
 # Add the toolchain and Renode bin directories to PATH
 ENV PATH="/opt/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/bin:/opt/renode_1.15.0_portable:${PATH}"
 
-# Set the working directory
+# Install Bazelisk (renamed as 'bazel')
+RUN wget https://github.com/bazelbuild/bazelisk/releases/download/v1.25.0/bazelisk-linux-amd64 \
+    && chmod +x bazelisk-linux-amd64 \
+    && mv bazelisk-linux-amd64 /usr/local/bin/bazel
+
+# Create new user 'constexpr'
+RUN useradd -m constexpr
+
+# Create and set working directory, ensuring it is owned by constexpr
+RUN mkdir -p /workspace && chown constexpr:constexpr /workspace
 WORKDIR /workspace
+
+# Switch to non-root user 'constexpr'
+USER constexpr
+
+# Run Bazel to trigger Bazelisk to download Bazel and its dependencies.
+RUN bazel version
 
 # Keep the container running
 CMD ["sleep", "infinity"]
