@@ -3,7 +3,7 @@
 
 class accelerometer {
 public:
-    struct data{
+    struct data {
         float x;
         float y;
         float z;
@@ -13,25 +13,49 @@ public:
         c_50_hz,
         c_100_hz,
     };
-    virtual void set_sampling_rate(sampling_rate) = 0;
+    enum error {
+        ok,
+        not_supported
+    };
+    virtual error set_sampling_rate(sampling_rate) = 0;
     virtual data get_data() = 0;
+};
+
+class i2c {
+public:
+    virtual void write() = 0;
+};
+
+class i2c_stm32 : public i2c {
+public:
+    void write() override {
+        printf("i2c::write...\r\n");
+    }
 };
 
 class adxl_345 : public accelerometer {
 public:
-    void set_sampling_rate(sampling_rate) override {
+    adxl_345(i2c &i2c_obj) : i2c_(i2c_obj) {}
+    error set_sampling_rate(sampling_rate) override {
         printf("adxl_345: setting sampling rate\r\n");
+        i2c_.write();
+        return error::ok;
     }
     data get_data() override {
         return data{0.02f, 0.981f, 0.03f};
     }
+private:
+    i2c &i2c_;
 };
 
 class tap_detection_algo {
 public:
     tap_detection_algo(accelerometer &accel) : 
         accel_(accel) {
-            accel_.set_sampling_rate(accelerometer::sampling_rate::c_100_hz);
+            auto err = accel_.set_sampling_rate(accelerometer::sampling_rate::c_100_hz);
+            if(err == accelerometer::error::not_supported) {
+                // try another sampling rate and adapt
+            }
     }
     bool run () {
         auto accel_data = accel_.get_data();
@@ -45,7 +69,8 @@ private:
 };
 
 int main() {
-    adxl_345 accel;
+    i2c_stm32 i2c1;
+    adxl_345 accel(i2c1);
     tap_detection_algo algo(accel);
     algo.run();
 
