@@ -59,6 +59,37 @@ struct timer3_traits {
     constexpr static std::uint32_t arr_bit_mask = 0xFFFF;
 };
 
+template<auto Bits, typename Reg, uint32_t Mask, uint32_t Pos = 0>
+struct reg_bits {
+    using reg = Reg;
+    using T = reg::RegType;
+
+    static_assert(std::is_same_v<T, decltype(Bits)>);
+
+    static constexpr T c_position = Pos;
+    static constexpr T c_mask = (Mask << c_position);
+
+    static_assert(Bits <= Mask);
+
+    enum class value : T {
+        val = Bits
+    };
+};
+
+template<typename Reg, uint32_t Pos>
+struct reg_bits_enable_disable {
+    using reg = Reg;
+    using T = reg::RegType;
+
+    static constexpr T c_position = Pos;
+    static constexpr T c_mask = (0x1UL << c_position);
+
+    enum class value : T {
+        disable = 0,
+        enable = 1
+    };
+};
+
 template <typename TimerTraits>
 struct timer {
     constexpr static std::uintptr_t base_address = TimerTraits::base_address;
@@ -68,37 +99,6 @@ struct timer {
     using sr = reg<base_address + 0x10>;
     using psc = reg<base_address + 0x28>;
     using arr = reg<base_address + 0x2C>;
-
-    template<auto Bits, typename Reg, uint32_t Mask, uint32_t Pos = 0>
-    struct reg_bits {
-        using reg = Reg;
-        using T = reg::RegType;
-
-        static_assert(std::is_same_v<T, decltype(Bits)>);
-
-        static constexpr T c_position = Pos;
-        static constexpr T c_mask = (Mask << c_position);
-
-        static_assert(Bits <= Mask);
-
-        enum class value : T {
-            val = Bits
-        };
-    };
-
-    template<typename Reg, uint32_t Pos>
-    struct reg_bits_enable_disable {
-        using reg = Reg;
-        using T = reg::RegType;
-
-        static constexpr T c_position = Pos;
-        static constexpr T c_mask = (0x1UL << c_position);
-
-        enum class value : T {
-            disable = 0,
-            enable = 1
-        };
-    };
 
     template<auto Bits>
     using psc_bits = reg_bits<Bits, psc, static_cast<uint32_t>(0xFFFF)>;
