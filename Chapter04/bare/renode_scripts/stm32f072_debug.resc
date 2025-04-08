@@ -9,6 +9,7 @@ showAnalyzer usart2
 
 macro reset
 """
+    logLevel 3 sysbus
     sysbus LoadELF $bin
 """
 

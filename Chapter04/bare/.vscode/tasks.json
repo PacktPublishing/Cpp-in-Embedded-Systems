@@ -17,21 +17,10 @@
             "detail": "Generates build system files with CMake"
         },
         {
-            "label": "Copy Compile Db",
-            "type": "shell",
-            "dependsOn": [
-                "Configure"
-            ],
-            "command": "cp ${workspaceFolder}/build/compile_commands.json ${workspaceFolder}",
-            "group": "build",
-            "problemMatcher": [],
-            "detail": "Generates build system files with CMake"
-        },
-        {
             "label": "Build",
             "type": "shell",
             "dependsOn": [
-                "Copy Compile Db"
+                "Configure"
             ],
             "command": "make",
             "args": [
