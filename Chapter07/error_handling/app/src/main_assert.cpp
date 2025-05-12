@@ -42,7 +42,9 @@ int main()
 
     printf("Assert example\r\n");
     
-    const option opt = uint8_to_option(3);
+
+    // maybe_unused attribute will silence unused variable warning
+    [[maybe_unused]] const option opt = uint8_to_option(3);
 
     while(true)
     {

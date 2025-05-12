@@ -115,6 +115,7 @@ add_executable(
   platform/src/system_stm32f0xx.c
   hal/uart/src/uart_stm32.cpp
   cstdlib_support/retarget.cpp
+  cstdlib_support/nosys_stubs.c
   ${MAIN_CPP_PATH}/${MAIN_CPP_FILE_NAME}
   )
 
